@@ -84,11 +84,11 @@ if (isset($_POST['update'])) {
             </div>
         <?php endif; ?>
 
-        <h2 style="margin-top: 28px; color: #4caf50;">How to Test Update Injections:</h2>
+        <h2 style="margin-top: 28px; color: #4caf50;">Injections:</h2>
         <ul class="hint-list">
-            <li><strong>Normal behavior:</strong> Enter a correct email, old ID, and a new number. It updates that specific student's ID.</li>
-            <li><strong>Mass Update:</strong> Type <code>9999' -- </code> in the New ID field, and leave Old ID blank. This comments out the WHERE clause entirely, changing EVERY student's ID to 9999.</li>
-            <li><strong>Multiple Statements (Stacked Queries):</strong> In the New ID field, type <code>9999' WHERE StudentID='1001'; UPDATE Student SET Major='Hacked' WHERE StudentID='1002'; -- </code>. This closes the first update, adds a semicolon, and executes a second malicious query to update a different student entirely!</li>
+            <li><code>9999' -- </code></li>
+            <li><code>9999', Major='Hacked</code></li>
+            <li><code>9999' WHERE StudentID='1001'; UPDATE Student SET Major='Hacked' WHERE StudentID='1002'; -- </code></li>
         </ul>
 
         <a href="sql_injection_demo.php" class="back-link" style="margin-top: 20px;">← Back to Login Injection Demo</a>

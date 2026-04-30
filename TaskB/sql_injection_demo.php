@@ -118,11 +118,10 @@ if (isset($_GET['login'])) {
             <?php endif; ?>
         <?php endif; ?>
 
-        <h2 style="margin-top: 28px; color: #4caf50;">How to Test Injections:</h2>
+        <h2 style="margin-top: 28px; color: #4caf50;">Injections:</h2>
         <ul class="hint-list">
-            <li><strong>Normal behavior:</strong> Type <code>alice.j@university.edu</code> in Email and <code>1001</code> in ID. It only returns Alice.</li>
-            <li><strong>Authentication Bypass (Always True):</strong> Type <code>' OR 1=1 -- </code> in the Email field and leave the ID blank. The <code>-- </code> comments out the ID check entirely, and <code>1=1</code> makes the condition true, logging you in and returning EVERY student.</li>
-            <li><strong>Targeted Bypass:</strong> Type <code>bob.s@university.edu' -- </code> in the Email field to log in as Bob without knowing his Student ID.</li>
+            <li><code>' OR 1=1 -- </code></li>
+            <li><code>bob.s@university.edu' -- </code></li>
         </ul>
 
         <a href="index.php" class="back-link">Back to Dashboard</a>
