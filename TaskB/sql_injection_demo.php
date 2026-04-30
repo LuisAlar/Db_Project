@@ -1,19 +1,14 @@
 <?php
 require 'config/db_connect.php';
 
-$studentId = isset($_GET['StudentID']) ? trim($_GET['StudentID']) : '';
-$firstName = isset($_GET['FirstName']) ? trim($_GET['FirstName']) : '';
-$major = isset($_GET['Major']) ? trim($_GET['Major']) : '';
+$email = isset($_GET['Email']) ? $_GET['Email'] : '';
+$studentId = isset($_GET['StudentID']) ? $_GET['StudentID'] : '';
 $generatedSql = null;
 $result = null;
 $errorMsg = null;
 
-if (isset($_GET['search'])) {
-    $generatedSql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear
-        FROM Student
-        WHERE StudentID = '$studentId'
-          AND FirstName = '$firstName'
-          AND Major = '$major'";
+if (isset($_GET['login'])) {
+    $generatedSql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear FROM Student WHERE Email = '$email' AND StudentID = '$studentId'";
 
     $result = $conn->query($generatedSql);
     if ($result === false) {
@@ -59,26 +54,23 @@ if (isset($_GET['search'])) {
 <body>
     <div class="container" style="max-width: 1000px;">
         <header>
-            <h1>SQL Injection Demo</h1>
+            <h1>Student Portal Login</h1>
+            <p>Demonstrates SQL injection</p>
         </header>
 
         <form method="GET" action="sql_injection_demo.php">
             <div class="form-group">
+                <label for="Email">Student Email</label>
+                <input type="text" id="Email" name="Email" value="<?php echo htmlspecialchars($email); ?>" placeholder="e.g. alice.j@university.edu or injection payload">
+            </div>
+
+            <div class="form-group">
                 <label for="StudentID">Student ID</label>
-                <input type="text" id="StudentID" name="StudentID" value="<?php echo htmlspecialchars($studentId); ?>" placeholder="Try a real ID or an injection payload">
+                <input type="password" id="StudentID" name="StudentID" value="<?php echo htmlspecialchars($studentId); ?>" placeholder="e.g. 1001">
             </div>
 
-            <div class="form-group">
-                <label for="FirstName">First Name</label>
-                <input type="text" id="FirstName" name="FirstName" value="<?php echo htmlspecialchars($firstName); ?>" placeholder="Example: Alice">
-            </div>
-
-            <div class="form-group">
-                <label for="Major">Major</label>
-                <input type="text" id="Major" name="Major" value="<?php echo htmlspecialchars($major); ?>" placeholder="Example: Computer Science">
-            </div>
-
-            <button type="submit" name="search" value="1">Submit</button>
+            <button type="submit" name="login" value="1">Login</button>
+            <a href="sql_injection_update_demo.php" class="back-link" style="margin-left: 15px; display: inline-block;">Change ID (Update Demo)</a>
         </form>
 
         <?php if ($generatedSql): ?>
@@ -125,13 +117,12 @@ if (isset($_GET['search'])) {
             <?php endif; ?>
         <?php endif; ?>
 
-        <!-- <h2 style="margin-top: 28px; color: #4caf50;">Read-Only Payload Ideas</h2>
+        <h2 style="margin-top: 28px; color: #4caf50;">How to Test Injections:</h2>
         <ul class="hint-list">
-            <li><code>' OR '1'='1' -- </code> in the <code>First Name</code> field while putting anything in the other fields.</li>
-            <li><code>' OR 'x'='x' -- </code> in the <code>Major</code> field to bypass exact matching.</li>
-            <li><code>1001' OR '1'='1' -- </code> in the <code>Student ID</code> field to turn a strict ID lookup into a broad query.</li>
-            <li><code>' OR Major='Computer Science' -- </code> in the <code>First Name</code> field to force results for a chosen major.</li>
-        </ul> -->
+            <li><strong>Normal behavior:</strong> Type <code>alice.j@university.edu</code> in Email and <code>1001</code> in ID. It only returns Alice.</li>
+            <li><strong>Authentication Bypass (Always True):</strong> Type <code>' OR 1=1 -- </code> in the Email field and leave the ID blank. The <code>-- </code> comments out the ID check entirely, and <code>1=1</code> makes the condition true, logging you in and returning EVERY student.</li>
+            <li><strong>Targeted Bypass:</strong> Type <code>bob.s@university.edu' -- </code> in the Email field to log in as Bob without knowing his Student ID.</li>
+        </ul>
 
         <a href="index.php" class="back-link">Back to Dashboard</a>
     </div>
