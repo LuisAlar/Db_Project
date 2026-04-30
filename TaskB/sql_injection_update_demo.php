@@ -44,8 +44,8 @@ if (isset($_POST['update'])) {
 <body>
     <div class="container" style="max-width: 1000px;">
         <header>
-            <h1>Change Student ID (Update Injection)</h1>
-            <p>Demonstrates UPDATE injection and Multiple SQL Statements (Stacked Queries).</p>
+            <h1>Change Student ID</h1>
+            <p>Demonstrates UPDATE injection and Multiple SQL Statements</p>
         </header>
 
         <form method="POST" action="sql_injection_update_demo.php">

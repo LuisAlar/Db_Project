@@ -1,26 +1,21 @@
 <?php
 require 'config/db_connect.php';
 
-$studentId = isset($_GET['StudentID']) ? trim($_GET['StudentID']) : '';
-$firstName = isset($_GET['FirstName']) ? trim($_GET['FirstName']) : '';
-$major = isset($_GET['Major']) ? trim($_GET['Major']) : '';
+$email = isset($_GET['Email']) ? $_GET['Email'] : '';
+$studentId = isset($_GET['StudentID']) ? $_GET['StudentID'] : '';
 $generatedSql = null;
 $result = null;
 $errorMsg = null;
 
-if (isset($_GET['search'])) {
-    $generatedSql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear
-        FROM Student
-        WHERE StudentID = ?
-          AND FirstName = ?
-          AND Major = ?";
+if (isset($_GET['login'])) {
+    $generatedSql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear FROM Student WHERE Email = ? AND StudentID = ?";
 
     $stmt = $conn->prepare($generatedSql);
     
     if ($stmt === false) {
         $errorMsg = "Prepare failed: " . $conn->error;
     } else {
-        $stmt->bind_param("sss", $studentId, $firstName, $major);
+        $stmt->bind_param("ss", $email, $studentId);
         
         if ($stmt->execute()) {
             $result = $stmt->get_result();
@@ -75,7 +70,8 @@ if (isset($_GET['search'])) {
 <body>
     <div class="container" style="max-width: 1000px;">
         <header>
-            <h1>SQL Injection Prevention - Prepared Statements</h1>
+            <h1>Student Portal Login (Protected)</h1>
+            <p>Demonstrates SQL injection prevention using Prepared Statements.</p>
         </header>
 
         <div class="protection-info">
@@ -85,21 +81,16 @@ if (isset($_GET['search'])) {
 
         <form method="GET" action="sql_injection_protected.php">
             <div class="form-group">
+                <label for="Email">Student Email</label>
+                <input type="text" id="Email" name="Email" value="<?php echo htmlspecialchars($email); ?>" placeholder="e.g. alice.j@university.edu or injection payload">
+            </div>
+
+            <div class="form-group">
                 <label for="StudentID">Student ID</label>
-                <input type="text" id="StudentID" name="StudentID" value="<?php echo htmlspecialchars($studentId); ?>" placeholder="Try an injection payload - it won't work!">
+                <input type="password" id="StudentID" name="StudentID" value="<?php echo htmlspecialchars($studentId); ?>" placeholder="e.g. 1001">
             </div>
 
-            <div class="form-group">
-                <label for="FirstName">First Name</label>
-                <input type="text" id="FirstName" name="FirstName" value="<?php echo htmlspecialchars($firstName); ?>" placeholder="Example: Alice">
-            </div>
-
-            <div class="form-group">
-                <label for="Major">Major</label>
-                <input type="text" id="Major" name="Major" value="<?php echo htmlspecialchars($major); ?>" placeholder="Example: Computer Science">
-            </div>
-
-            <button type="submit" name="search" value="1">Submit</button>
+            <button type="submit" name="login" value="1">Login</button>
         </form>
 
         <?php if ($generatedSql): ?>
@@ -155,15 +146,13 @@ if (isset($_GET['search'])) {
             These payloads would work on the vulnerable page but are blocked here:
         </div>
         <ul class="hint-list">
-            <li><code>' OR '1'='1' -- </code> in any field</li>
-            <li><code>' OR 'x'='x' -- </code> in the Major field</li>
-            <li><code>1001' OR '1'='1' -- </code> in the Student ID field</li>
-            <li><code>' OR Major='Computer Science' -- </code> in the First Name field</li>
+            <li><code>' OR 1=1 -- </code> in the Email field</li>
+            <li><code>bob.s@university.edu' -- </code> in the Email field</li>
         </ul>
 
         <div style="margin-top: 20px;">
-            <a href="sql_injection_demo.php" style="margin-right: 16px;">View Vulnerable Version</a>
-            <a href="index.php" class="back-link">Back to Dashboard</a>
+            <a href="sql_injection_demo.php" style="margin-right: 16px;">View Vulnerable Login</a>
+            <a href="index.html" class="back-link">Back to Dashboard</a>
         </div>
     </div>
 </body>

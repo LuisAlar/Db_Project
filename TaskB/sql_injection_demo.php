@@ -70,7 +70,8 @@ if (isset($_GET['login'])) {
             </div>
 
             <button type="submit" name="login" value="1">Login</button>
-            <a href="sql_injection_update_demo.php" class="back-link" style="margin-left: 15px; display: inline-block;">Change ID (Update Demo)</a>
+            <a href="sql_injection_update_demo.php" class="back-link" style="margin-left: 15px; display: inline-block;">Change Student Id</a>
+            <a href="sql_injection_protected.php" class="back-link" style="margin-left: 15px; display: inline-block;">Protected Login</a>
         </form>
 
         <?php if ($generatedSql): ?>
