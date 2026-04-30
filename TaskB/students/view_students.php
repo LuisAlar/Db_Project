@@ -1,9 +1,21 @@
 <?php
 require '../config/db_connect.php';
 
-// READ: Fetch all students from the database
-$sql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear FROM Student";
-$result = $conn->query($sql);
+// Get search parameters
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+// READ: Fetch students from the database with optional search
+if (!empty($searchTerm)) {
+    $sql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear FROM Student WHERE LastName LIKE ? OR Major LIKE ?";
+    $stmt = $conn->prepare($sql);
+    $searchPattern = '%' . $searchTerm . '%';
+    $stmt->bind_param("ss", $searchPattern, $searchPattern);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    $sql = "SELECT StudentID, FirstName, LastName, Email, Major, GradYear FROM Student";
+    $result = $conn->query($sql);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,6 +50,22 @@ $result = $conn->query($sql);
 
         <a href="student_form.html" class="back-link" style="display:inline-block; margin-bottom: 15px;">➕ Add New Student</a>
 
+        <!-- Search Form -->
+        <form method="GET" action="view_students.php" style="margin: 20px 0; padding: 15px; background: #f7f7f7; border-radius: 5px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label for="search" style="font-weight: 600;">Search by Last Name or Major:</label>
+                <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($searchTerm); ?>" placeholder="Enter search term..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; color: #333;">
+                <button type="submit" style="padding: 8px 20px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Search</button>
+                <?php if (!empty($searchTerm)): ?>
+                    <a href="view_students.php" style="padding: 8px 20px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-weight: 600;">Clear</a>
+                <?php endif; ?>
+            </div>
+        </form>
+
+        <?php if (!empty($searchTerm)): ?>
+            <p style="margin-top: 10px; color: #666;">Showing results for: <strong><?php echo htmlspecialchars($searchTerm); ?></strong></p>
+        <?php endif; ?>
+
         <?php if ($result && $result->num_rows > 0): ?>
             <table>
                 <thead>
@@ -70,7 +98,9 @@ $result = $conn->query($sql);
                 </tbody>
             </table>
         <?php else: ?>
-            <p style="margin-top:20px; padding: 20px; background: #e3eba5; text-align: center;">No students found in the database. Go ahead and add one!</p>
+            <p style="margin-top:20px; padding: 20px; background: #e3eba5; text-align: center;">
+                <?php echo !empty($searchTerm) ? 'No students found matching your search.' : 'No students found in the database. Go ahead and add one!'; ?>
+            </p>
         <?php endif; ?>
 
         <br>
@@ -79,6 +109,9 @@ $result = $conn->query($sql);
 </body>
 </html>
 <?php 
+if(isset($stmt)){
+    $stmt->close();
+}
 if(isset($conn)){
     $conn->close(); 
 }
